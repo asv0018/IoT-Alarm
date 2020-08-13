@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "954634837626",
+    "firebase_url": "https://iot-alarm-cf8df.firebaseio.com",
+    "project_id": "iot-alarm-cf8df",
+    "storage_bucket": "iot-alarm-cf8df.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:954634837626:android:036aed215e619dab76a5c3",
+        "android_client_info": {
+          "package_name": "com.thinkfinitylabs.iotalarm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "954634837626-v6pno1534im449b3e4oor96fll4k0phc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3AJC8dH5WAN1AneLIDTTJjV-zrE6yau4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "954634837626-v6pno1534im449b3e4oor96fll4k0phc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
