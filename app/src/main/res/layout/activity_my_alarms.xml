@@ -114,7 +114,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:gravity="center"
-                android:text="IoT Alarm"
+                android:text="My Alarm  Device"
                 android:textColor="#1CBDCF"
                 android:textColorLink="#FFFFFF"
                 android:textSize="18sp"

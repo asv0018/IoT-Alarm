@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_alarm"
+        android:id="@+id/toolbar_alarm_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content">
 
             <ImageButton
-                android:id="@+id/goBackButton"
+                android:id="@+id/goBackButton_edit"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:layout_weight="1"
@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:gravity="center"
-                android:text="Set Alarm"
+                android:text="Edit Alarm"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp"
                 android:textStyle="normal|bold|italic" />
@@ -44,35 +44,35 @@
     </androidx.appcompat.widget.Toolbar>
 
     <TimePicker
-        android:id="@+id/time_picker"
+        android:id="@+id/time_picker_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:headerBackground="@color/colorPrimary"
         android:numbersSelectorColor="@color/colorPrimary" />
 
-        <LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:layout_editor_absoluteX="410dp"
         tools:layout_editor_absoluteY="435dp">
 
-            <com.google.android.material.textfield.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/name_of_alarm_edit"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center">
+                android:layout_height="match_parent"
+                android:hint="Label"
+                android:singleLine="true"
+                android:textColorHint="@color/colorPrimary"
+                android:textSize="18sp" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/name_of_alarm"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="Label"
-                    android:singleLine="true"
-                    android:textColorHint="@color/colorPrimary"
-                    android:textSize="18sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -81,7 +81,7 @@
             android:weightSum="8">
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/textView3_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginRight="10dp"
@@ -98,12 +98,12 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/selectDaysButton"
+                    android:id="@+id/selectDaysButton_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:gravity="center|left"
-                    android:text="Select days"
+                    android:text="Change days"
                     android:textColor="#2979FF" />
             </LinearLayout>
         </LinearLayout>
@@ -114,13 +114,13 @@
             android:weightSum="8">
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/textView4_edit"
                 android:layout_width="53dp"
                 android:layout_height="match_parent"
                 android:layout_marginRight="10dp"
                 android:layout_weight="4"
                 android:gravity="center|right"
-                android:text="Set Music"
+                android:text="Change Music"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp" />
 
@@ -131,12 +131,12 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/setMusicButton"
+                    android:id="@+id/setMusicButton_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:gravity="center|left"
-                    android:text=" Set MUSIC"
+                    android:text=" Change MUSIC"
                     android:textColor="#2979FF" />
             </LinearLayout>
         </LinearLayout>
@@ -144,12 +144,12 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/save_and_close"
+        android:id="@+id/save_and_close_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:background="@drawable/button_bg"
-        android:text="save &amp; close"
+        android:text="update &amp; close"
         android:textColor="#FFFFFF" />
 
 </LinearLayout>

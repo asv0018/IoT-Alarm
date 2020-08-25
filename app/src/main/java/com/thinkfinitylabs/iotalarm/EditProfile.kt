@@ -147,7 +147,7 @@ class EditProfile : AppCompatActivity() {
     private fun update(full_name:String) {
         // Create new post at /user-posts/$userid/$postid and at
         val firebaseuid= FirebaseAuth.getInstance().currentUser!!.uid
-        val database=FirebaseDatabase.getInstance().getReference("users/$firebaseuid")
+        val database=FirebaseDatabase.getInstance().getReference("user_account/$firebaseuid")
         val child_Updates=HashMap<String,Any>()
         child_Updates["fullname"]=full_name
         database.updateChildren(child_Updates)

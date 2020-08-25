@@ -2,6 +2,7 @@ package com.thinkfinitylabs.iotalarm
 
 import MyMainActivityAdapter
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -25,6 +26,7 @@ import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    lateinit var progressDialog:ProgressDialog
     lateinit var vibrator: Vibrator
     lateinit var userUID: String
     lateinit var userAuth: FirebaseAuth
@@ -34,6 +36,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //setSupportActionBar(toolbar)
+        progressDialog = ProgressDialog(this)
+        progressDialog.setMessage("Please wait, Loading your data...")
+        progressDialog.show()
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         userAuth = FirebaseAuth.getInstance()
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -56,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         arrayListImage.add(R.drawable.sign_out)
 
         val arrayListName = arrayOf(
-            "IoT Alarm",
+            "IoT Device",
             "My Alarms",
             "My Mentees",
             "My Mentor",
@@ -68,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         grid_view.setOnItemClickListener { adapterView, parent, position, l ->
             vibrator.vibrate(60)
             when(arrayListName[position]){
-                "IoT Alarm"->{
+                "IoT Device"->{
                     startActivity(Intent(this@MainActivity,MyAlarms::class.java))
                 }
                 "My Mentees"->{
@@ -120,7 +125,9 @@ class MainActivity : AppCompatActivity() {
                         Toasty.success(this@MainActivity,"Welcome $username", Toast.LENGTH_SHORT).show()
                         Picasso.get().load(url_for_profilePic).into(user_image_logo)
                         welcome_user.text = "Hey $username"
+                        progressDialog.dismiss()
                     }else{
+                        progressDialog.dismiss()
                     startActivity(Intent(this@MainActivity,FillTheData::class.java))
                     finish()
                 }

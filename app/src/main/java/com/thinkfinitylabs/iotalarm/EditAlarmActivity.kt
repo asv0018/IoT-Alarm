@@ -3,93 +3,90 @@ package com.thinkfinitylabs.iotalarm
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
+import com.thinkfinitylabs.iotalarm.ScheduledActivity.Companion.keyOfChildCompanionObj
 import es.dmoral.toasty.Toasty
+import kotlinx.android.synthetic.main.activity_edit_alarm.*
 import kotlinx.android.synthetic.main.activity_set_alarm.*
 import java.io.File
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.min
 
-
-class SetAlarm : AppCompatActivity() {
+class EditAlarmActivity : AppCompatActivity() {
     var defaultSong = "https://firebasestorage.googleapis.com/v0/b/iot-alarm-cf8df.appspot.com/o/music_files%2Fdefault.mp3?alt=media&token=4d59a0ae-2b4b-459c-bd57-b5b5c7bdf47c"
-    lateinit var uri:Uri
+    lateinit var query: DatabaseReference
+    lateinit var uri: Uri
     lateinit var uid:String
     var musicSelected = false
-    lateinit var progressDialog:ProgressDialog
+    lateinit var progressDialog: ProgressDialog
     var setEverytime = false
     var setOnce = false
     val days = arrayOf("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
     val checkedItems = booleanArrayOf(false, false, false, false, false, false, false)
+    lateinit var alreadySelectedSong:String
     var selectedDays : MutableList<String> =  mutableListOf<String>()
     val REQ_CODE_PICK_SOUNDFILE = 1011
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_set_alarm)
-        time_picker.setIs24HourView(true)
+        setContentView(R.layout.activity_edit_alarm)
+        var keyOfChild = intent.getStringExtra("keyOfAlarm").toString()
+        if(keyOfChild == null){
+            keyOfChild = keyOfChildCompanionObj
+        }
+        time_picker_edit.setIs24HourView(true)
         progressDialog = ProgressDialog(this)
         progressDialog.setCanceledOnTouchOutside(false)
         progressDialog.setCancelable(false)
-        progressDialog.setMessage("Please wait while we open file manager...")
         uid = FirebaseAuth.getInstance().uid.toString()
-        goBackButton.setOnClickListener {
+        query = FirebaseDatabase.getInstance().reference.child("alarms_users/$uid/$keyOfChild")
+        attachValueEventListener()
+        goBackButton_edit.setOnClickListener {
             confirmToGoBack()
         }
-        selectDaysButton.setOnClickListener {
+        selectDaysButton_edit.setOnClickListener {
             selectDays()
         }
-        setMusicButton.setOnClickListener {
+        setMusicButton_edit.setOnClickListener {
+            progressDialog.setMessage("Please wait while we open file manager...")
             progressDialog.show()
             setMusic()
         }
 
-        save_and_close.setOnClickListener {
-            val name = name_of_alarm.text.toString().trimStart()
+        save_and_close_edit.setOnClickListener {
+            val name = name_of_alarm_edit.text.toString().trimStart().trimEnd()
             if(name.isBlank()){
-                Toasty.warning(this@SetAlarm,"The Label cannot be left blank or filled with spaces",Toast.LENGTH_SHORT).show()
+                Toasty.warning(this@EditAlarmActivity,"The Label cannot be left blank or filled with spaces",Toast.LENGTH_SHORT).show()
             }else{
                 var everytime = false
                 if(setEverytime) {
                     everytime = true
                 }
-                val randomname = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    RandomNumber()
-                } else {
-                    UUID.randomUUID().toString()
-                }
-                val hours = time_picker.hour
-                val mins = time_picker.minute
+                val hours = time_picker_edit.hour
+                val mins = time_picker_edit.minute
                 if(!musicSelected){
                     if(selectedDays.size < 1){
-                        Toasty.warning(this,"You cant leave days empty, select the days.",Toast.LENGTH_SHORT).show()
+                        Toasty.warning(this@EditAlarmActivity,"You cant leave days empty, select the days.",Toast.LENGTH_SHORT).show()
                     }else {
-                        Toasty.warning(
-                            this@SetAlarm,
-                            "If music is not choosen then the default music will be played",
-                            Toast.LENGTH_SHORT
-                        ).show()
                         progressDialog.setMessage("Please wait while we update cloud. hang on for a moment please...")
                         progressDialog.show()
                         var db =
-                            FirebaseDatabase.getInstance().reference.child("alarms_users/$uid/$randomname")
+                            FirebaseDatabase.getInstance().reference.child("alarms_users/$uid/$keyOfChild")
                         var hashmap = HashMap<String, Any>()
-                        hashmap["id"] = randomname
                         hashmap["name"] = name
-                        hashmap["music"] = defaultSong
+                        hashmap["music"] = alreadySelectedSong
                         hashmap["hours"] = hours
                         hashmap["minutes"] = mins
                         hashmap["days_selected"] = selectedDays
@@ -111,23 +108,21 @@ class SetAlarm : AppCompatActivity() {
                             }
                     }
                 }else{
-
                     if(selectedDays.size < 1){
-                        Toasty.warning(this@SetAlarm,"You cant leave days empty, select the days.",Toast.LENGTH_SHORT).show()
+                        Toasty.warning(this@EditAlarmActivity,"You cant leave days empty, select the days.",Toast.LENGTH_SHORT).show()
                     }else{
                         progressDialog.setTitle("Please wait while we update cloud.")
                         progressDialog.setMessage("we are working on it. hang on for a moment please...")
                         progressDialog.show()
-                        val storageRef = FirebaseStorage.getInstance().reference.child("alarms_users/$uid/$randomname")
+                        val storageRef = FirebaseStorage.getInstance().reference.child("alarms_users/$uid/$keyOfChild")
                         val uploadTask = storageRef.putFile(uri)
                         val task = uploadTask.continueWithTask{
                             val downloadUrl = it.result
                             val uri = downloadUrl.storage.downloadUrl
                             while(!uri.isComplete);
                             val url = uri.result.toString()
-                            var db = FirebaseDatabase.getInstance().reference.child("alarms_users/$uid/$randomname")
+                            var db = FirebaseDatabase.getInstance().reference.child("alarms_users/$uid/$keyOfChild")
                             var hashmap = HashMap<String,Any>()
-                            hashmap["id"] = randomname
                             hashmap["name"] = name
                             hashmap["music"] = url
                             hashmap["hours"] = hours
@@ -151,7 +146,6 @@ class SetAlarm : AppCompatActivity() {
                 }
             }
         }
-
     }
 
     override fun onBackPressed() {
@@ -168,6 +162,36 @@ class SetAlarm : AppCompatActivity() {
                 intent,"Select any music file less than 4MB"
             ), REQ_CODE_PICK_SOUNDFILE
         )
+    }
+
+    private fun attachValueEventListener(){
+        progressDialog.setMessage("Hang on, we are fetching alarm...")
+        query.addValueEventListener(object : ValueEventListener {
+            @RequiresApi(Build.VERSION_CODES.M)
+            override fun onDataChange(p0: DataSnapshot) {
+                if(p0.exists()) {
+                    val temp = p0.child("name").value.toString().trimEnd()
+                    name_of_alarm_edit.setText(temp)
+                    for (j in p0.child("days_selected").children) {
+                        checkedItems[days.indexOf(j.value.toString())] = true
+                        selectedDays.add(j.value.toString())
+                    }
+                    Log.d("MONITER","selected days "+selectedDays.toString())
+                    Log.d("MONITER","the truth value "+checkedItems.toString())
+                    Log.d("MONITER","The table key is "+days.toString())
+                    val data:HashMap<String,Long> = p0.value as HashMap<String, Long>
+                    time_picker_edit.hour = (data["hours"] as Long).toInt()
+                    time_picker_edit.minute = (data["minutes"] as Long).toInt()
+                    alreadySelectedSong = p0.child("music").value.toString()
+                }else{
+                    progressDialog.dismiss()
+                    Toasty.error(this@EditAlarmActivity,"Sorry, alarm data not found...",Toast.LENGTH_SHORT).show()
+                }
+            }
+            override fun onCancelled(p0: DatabaseError) {
+                Log.d("DEBUGGING","Data cancelled in profile fragment")
+            }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -198,9 +222,9 @@ class SetAlarm : AppCompatActivity() {
 
     private fun confirmToGoBack() {
         // Set up the alert builder
-        val builder = AlertDialog.Builder(this@SetAlarm)
-        builder.setTitle("Discard the alarm ?")
-        builder.setMessage("If you wish to discard the setting, you can press Discard button.")
+        val builder = AlertDialog.Builder(this@EditAlarmActivity)
+        builder.setTitle("Dont want to update alarm ?")
+        builder.setMessage("If you wish to discard unsaved settings, you can press Discard button.")
         // Add OK and Cancel buttons
         builder.setPositiveButton("Discard") { dialog, which ->
             // The user clicked OK
@@ -218,7 +242,7 @@ class SetAlarm : AppCompatActivity() {
 
     private fun selectDays() {
         // Set up the alert builder
-        val builder = AlertDialog.Builder(this@SetAlarm)
+        val builder = AlertDialog.Builder(this@EditAlarmActivity)
         builder.setTitle("Select Days")
 
         // Add a checkbox list
@@ -235,12 +259,12 @@ class SetAlarm : AppCompatActivity() {
         // Add OK and Cancel buttons
         builder.setPositiveButton("Set once") { dialog, which ->
             // The user clicked OK
-            Toasty.info(this@SetAlarm,"Set to ring once",Toast.LENGTH_LONG).show()
+            Toasty.info(this@EditAlarmActivity,"Set to ring once", Toast.LENGTH_LONG).show()
             setOnce = true
             setEverytime = false
         }
         builder.setNegativeButton("Set every time") {dialog, which ->
-            Toasty.info(this@SetAlarm,"Set to ring every time",Toast.LENGTH_LONG).show()
+            Toasty.info(this@EditAlarmActivity,"Set to ring every time", Toast.LENGTH_LONG).show()
             setEverytime = true
             setOnce = false
         }
@@ -256,5 +280,4 @@ class SetAlarm : AppCompatActivity() {
     private fun RandomNumber(): String {
         return LocalDateTime.now().toString().slice(0..18)
     }
-
 }
